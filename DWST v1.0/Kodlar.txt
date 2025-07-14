@@ -1,0 +1,116 @@
+import tkinter as tk
+from ttkbootstrap import Style
+from ttkbootstrap.widgets import Button
+import keyboard
+import threading
+import time
+
+watched_keys = ['w', 'a', 's', 'd']
+opposites = {'w': 's', 's': 'w', 'a': 'd', 'd': 'a'}
+
+running = False
+aktif_tema = "darkly"
+
+pencere = tk.Tk()
+pencere.iconbitmap("DWST.ico")
+pencere.title("DWST - Don'tWantSnapTap")
+pencere.geometry("500x300")
+
+style = Style(theme=aktif_tema)
+
+temalar = ["darkly", "flatly"]
+
+def rapid_trigger():
+    while running:
+        event = keyboard.read_event()
+        if event.name in watched_keys and event.event_type == 'up':
+            opposite = opposites[event.name]
+            keyboard.press(opposite)
+            time.sleep(0.001)
+            keyboard.release(opposite)
+
+def baslat():
+    global running
+    running = True
+    baslat_buton.place_forget()
+    durdur_buton.place(relx=0.5, rely=0.7, anchor="center")
+    durum_etiketi.config(text="Şu an çalışıyor.")
+    threading.Thread(target=rapid_trigger, daemon=True).start()
+
+def durdur():
+    global running
+    running = False
+    durdur_buton.place_forget()
+    baslat_buton.place(relx=0.5, rely=0.7, anchor="center")
+    durum_etiketi.config(text="")
+
+def tema_degistir():
+    global aktif_tema
+    aktif_tema = temalar[1] if aktif_tema == temalar[0] else temalar[0]
+    style.theme_use(aktif_tema)
+
+def ayarlar_ac():
+    ayar_popup = tk.Toplevel(pencere)
+    ayar_popup.title("Ayarlar")
+    ayar_popup.geometry("250x100")
+    label = tk.Label(
+        ayar_popup,
+        text="Şu an için mevcut değil",
+        font=("Segoe UI", 11)
+    )
+    label.pack(expand=True)
+
+
+baslik = tk.Label(
+    pencere,
+    text="DWST",
+    font=("Impact", 28, "bold")
+)
+baslik.pack(pady=(20, 0))
+
+alt_baslik = tk.Label(
+    pencere,
+    text="(Don'tWantSnapTap)",
+    font=("Segoe UI", 10)
+)
+alt_baslik.pack()
+
+ayarlar_buton = Button(
+    pencere,
+    text="⚙",
+    bootstyle="secondary",
+    command=ayarlar_ac
+)
+ayarlar_buton.place(x=10, y=10)
+
+tema_buton = Button(
+    pencere,
+    text="Açık/Koyu Tema",
+    bootstyle="secondary",
+    command=tema_degistir
+)
+tema_buton.place(x=370, y=10)
+
+durum_etiketi = tk.Label(
+    pencere,
+    text="",
+    font=("Segoe UI", 12, "bold")
+)
+durum_etiketi.place(relx=0.5, rely=0.62, anchor="center")
+
+baslat_buton = Button(
+    pencere,
+    text="Başlat!",
+    bootstyle="success",
+    command=baslat
+)
+baslat_buton.place(relx=0.5, rely=0.7, anchor="center")
+
+durdur_buton = Button(
+    pencere,
+    text="Durdur",
+    bootstyle="danger",
+    command=durdur
+)
+
+pencere.mainloop()
