@@ -1,0 +1,2 @@
+-Oyunu büyük ölçüde etkileyen bug fixlendi
+-Arayüz geliştirildi.
